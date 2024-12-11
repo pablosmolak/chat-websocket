@@ -24,7 +24,7 @@
 
     .chat-container {
       width: 100%;
-      max-width: 400px;
+      max-width: 600px;
       background: #fff;
       border-radius: 8px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -115,7 +115,6 @@
       <h2>Bem Vindo ao Chat</h2>
       <form id="login-form">
         <input type="email" id="email" placeholder="Entre com seu email" required>
-        <input type="text" id="name" placeholder="Entre com seu nome">
         <input type="text" id="room-ID" placeholder="Entre com o id da sala" required>
         <button type="submit">Entrar</button>
       </form>
@@ -144,18 +143,27 @@
     let socket;
     let userEmail;
 
+    let loggedInUserName;
+
+    function getNameFromEmail(email) {
+    return email.split('@')[0];
+}
+
+
     // Handle login form submission
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const email = document.getElementById('email').value;
-      const name = document.getElementById('name').value;
+      const name = getNameFromEmail(email)
       const roomPassword = document.getElementById('room-ID').value;
 
       userEmail = email;
 
+      loggedInUserName = name; 
+
       // Connect to WebSocket
-      socket = io('http://localhost:3000');
+      socket = io('http://10.255.64.149:3000');
 
       // Join the room
       socket.emit('joinRoom', { email, name, password: roomPassword });
@@ -167,8 +175,33 @@
         renderMessages(messages);
       });
 
+      if (Notification.permission !== 'granted') {
+        Notification.requestPermission();
+      }
+
+      function playNotificationSound() {
+        const audio = new Audio('http://10.255.64.149:5500/ai_voice%20(1).mp3'); // Substitua pelo caminho do seu arquivo de som
+        audio.play();
+      }
+
+      // Função para mostrar a notificação
+      function showNotification(message) {
+        if (Notification.permission === 'granted') {
+          new Notification('Nova mensagem!', {
+            body: message,
+            icon: 'path/to/icon.png'  // Você pode adicionar um ícone, se quiser
+          });
+        }
+      }
+
       socket.on('newMessage', (message) => {
         renderMessage(message);
+       console.log( message.name)
+       console.log( loggedInUserName)
+        if (message.name !== loggedInUserName) {
+        showNotification(`${message.name}: ${message.message}`);
+        playNotificationSound();
+      }
       });
 
       socket.on('error', (errorMessage) => {
@@ -204,7 +237,13 @@
     function renderMessage({ name, message, date }) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message');
-      messageElement.innerHTML = `<span>${name}:</span> ${message} <span class="date">(${new Date(date).toLocaleString()})</span>`;
+
+      // Detect and convert URLs into clickable links
+      const messageWithLinks = message.replace(/(https?:\/\/[^\s]+)/g, (url) => {
+        return `<a href="${url}" target="_blank" style="color: #007bff; text-decoration: none;">${url}</a>`;
+      });
+
+      messageElement.innerHTML = `<span>${name}:</span> ${messageWithLinks} <span class="date">(${new Date(date).toLocaleString()})</span>`;
       chatMessages.appendChild(messageElement);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
