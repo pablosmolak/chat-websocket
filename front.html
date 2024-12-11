@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
       padding: 0;
       box-sizing: border-box;
     }
+
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f9;
@@ -19,6 +21,7 @@
       align-items: center;
       height: 100vh;
     }
+
     .chat-container {
       width: 100%;
       max-width: 400px;
@@ -27,25 +30,33 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       overflow: hidden;
     }
-    .login-section, .chat-section {
+
+    .login-section,
+    .chat-section {
       padding: 20px;
       display: none;
     }
-    .login-section.active, .chat-section.active {
+
+    .login-section.active,
+    .chat-section.active {
       display: block;
     }
+
     h2 {
       margin-bottom: 20px;
       color: #333;
       text-align: center;
     }
-    input, button {
+
+    input,
+    button {
       width: 100%;
       padding: 10px;
       margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 5px;
     }
+
     button {
       background: #007bff;
       color: white;
@@ -53,9 +64,11 @@
       cursor: pointer;
       border: none;
     }
+
     button:hover {
       background: #0056b3;
     }
+
     .chat-messages {
       height: 300px;
       overflow-y: auto;
@@ -65,29 +78,46 @@
       background: #f9f9f9;
       margin-bottom: 10px;
     }
+
     .message {
       margin-bottom: 10px;
     }
+
     .message span {
       font-weight: bold;
     }
+
     .message .date {
       color: #888;
       font-size: 12px;
       margin-left: 5px;
     }
+
+    /* Button to exit room */
+    .exit-button {
+      background: #dc3545;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .exit-button:hover {
+      background: #c82333;
+    }
   </style>
 </head>
+
 <body>
   <div class="chat-container">
     <!-- Login Section -->
     <div class="login-section active" id="login-section">
-      <h2>Welcome to Chat</h2>
+      <h2>Bem Vindo ao Chat</h2>
       <form id="login-form">
-        <input type="email" id="email" placeholder="Enter your email" required value="pablo@gmail.com">
-        <input type="text" id="name" placeholder="Enter your name (if new user)" value="Pablo">
-        <input type="password" id="room-password" placeholder="Enter room password" required value="senha123">
-        <button type="submit">Join Room</button>
+        <input type="email" id="email" placeholder="Entre com seu email" required>
+        <input type="text" id="name" placeholder="Entre com seu nome">
+        <input type="text" id="room-ID" placeholder="Entre com o id da sala" required>
+        <button type="submit">Entrar</button>
       </form>
     </div>
 
@@ -96,9 +126,10 @@
       <h2>Chat Room</h2>
       <div class="chat-messages" id="chat-messages"></div>
       <form id="message-form">
-        <input type="text" id="message" placeholder="Type your message..." required>
-        <button type="submit">Send</button>
+        <input type="text" id="message" placeholder="Escreva sua mensagem..." required>
+        <button type="submit">Enviar</button>
       </form>
+      <button class="exit-button" id="exit-button">Sair da Sala</button>
     </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
@@ -108,6 +139,7 @@
     const loginForm = document.getElementById('login-form');
     const messageForm = document.getElementById('message-form');
     const chatMessages = document.getElementById('chat-messages');
+    const exitButton = document.getElementById('exit-button');
 
     let socket;
     let userEmail;
@@ -118,7 +150,7 @@
 
       const email = document.getElementById('email').value;
       const name = document.getElementById('name').value;
-      const roomPassword = document.getElementById('room-password').value;
+      const roomPassword = document.getElementById('room-ID').value;
 
       userEmail = email;
 
@@ -131,6 +163,7 @@
       socket.on('chatHistory', (messages) => {
         loginSection.classList.remove('active');
         chatSection.classList.add('active');
+        console.log(messages)
         renderMessages(messages);
       });
 
@@ -153,6 +186,14 @@
       document.getElementById('message').value = '';
     });
 
+    // Handle exiting the room
+    exitButton.addEventListener('click', () => {
+      socket.emit('leaveRoom', { email: userEmail });
+      loginSection.classList.add('active');
+      chatSection.classList.remove('active');
+      socket.disconnect();
+    });
+
     // Render chat messages
     function renderMessages(messages) {
       chatMessages.innerHTML = '';
@@ -169,4 +210,5 @@
     }
   </script>
 </body>
+
 </html>

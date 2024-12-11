@@ -13,6 +13,7 @@ services:
       - MONGO_INITDB_DATABASE=chat   # Nome do banco de dados a ser criado
     networks:
       - chat_network
+    restart: always
 
 networks:
   chat_network:
