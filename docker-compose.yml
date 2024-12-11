@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db         # Volumes para persistência dos dados
+      - ./data:/docker-entrypoint-initdb.d  # A pasta 'data' com o arquivo dump.json
+    environment:
+      - MONGO_INITDB_DATABASE=chat   # Nome do banco de dados a ser criado
+    networks:
+      - chat_network
+
+networks:
+  chat_network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
