@@ -81,6 +81,7 @@
 
     .message {
       margin-bottom: 10px;
+      user-select: none; /* Impede a seleção de texto */
     }
 
     .message span {
@@ -146,9 +147,8 @@
     let loggedInUserName;
 
     function getNameFromEmail(email) {
-    return email.split('@')[0];
-}
-
+      return email.split('@')[0];
+    }
 
     // Handle login form submission
     loginForm.addEventListener('submit', (e) => {
@@ -196,12 +196,12 @@
 
       socket.on('newMessage', (message) => {
         renderMessage(message);
-       console.log( message.name)
-       console.log( loggedInUserName)
+        console.log(message.name)
+        console.log(loggedInUserName)
         if (message.name !== loggedInUserName) {
-        showNotification(`${message.name}: ${message.message}`);
-        playNotificationSound();
-      }
+          showNotification(`${message.name}: ${message.message}`);
+          playNotificationSound();
+        }
       });
 
       socket.on('error', (errorMessage) => {
@@ -247,6 +247,11 @@
       chatMessages.appendChild(messageElement);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+
+    // Bloquear o clique com o botão direito do mouse
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault(); // Impede o menu de contexto (botão direito)
+    });
   </script>
 </body>
 
