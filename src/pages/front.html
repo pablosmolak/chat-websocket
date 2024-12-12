@@ -77,6 +77,7 @@
       padding: 10px;
       background: #f9f9f9;
       margin-bottom: 10px;
+      word-wrap: break-word;
     }
 
     .message {
@@ -126,7 +127,7 @@
       <h2>Chat Room</h2>
       <div class="chat-messages" id="chat-messages"></div>
       <form id="message-form">
-        <input type="text" id="message" placeholder="Escreva sua mensagem..." required>
+        <input type="text" id="message" placeholder="Escreva sua mensagem..." maxlength="256" minlength="1" required >
         <button type="submit">Enviar</button>
       </form>
       <button class="exit-button" id="exit-button">Sair da Sala</button>
