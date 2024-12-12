@@ -163,7 +163,7 @@
       loggedInUserName = name; 
 
       // Connect to WebSocket
-      socket = io('http://10.255.64.149:3000');
+      socket = io('http://localhost:3000');
 
       // Join the room
       socket.emit('joinRoom', { email, name, password: roomPassword });
@@ -180,7 +180,7 @@
       }
 
       function playNotificationSound() {
-        const audio = new Audio('http://10.255.64.149:5500/ai_voice%20(1).mp3'); // Substitua pelo caminho do seu arquivo de som
+        const audio = new Audio('/pages/audios/notificacao.mp3'); // Substitua pelo caminho do seu arquivo de som
         audio.play();
       }
 
