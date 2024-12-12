@@ -2,141 +2,275 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat Application</title>
-  <style>
-    /* Global styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <style>
+        /* Global styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #ffffff, #828c9e);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-    .chat-container {
-      width: 100%;
-      max-width: 600px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
+        .app-container {
+            width: 100%;
+            max-width: 1000px;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-in-out;
+            border-radius: 10px;
 
-    .login-section,
-    .chat-section {
-      padding: 20px;
-      display: none;
-    }
+            /* Adicione estas linhas */
+            display: flex;
+            flex-direction: column;
+            /* Alinha verticalmente os itens */
+            align-items: center;
+            /* Centraliza horizontalmente os itens */
+            justify-content: center;
+            /* Centraliza verticalmente os itens */
+        }
 
-    .login-section.active,
-    .chat-section.active {
-      display: block;
-    }
 
-    h2 {
-      margin-bottom: 20px;
-      color: #333;
-      text-align: center;
-    }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
 
-    input,
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    button {
-      background: #007bff;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-    }
+        .login-container {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
 
-    button:hover {
-      background: #0056b3;
-    }
+        .loader-container {
+            display: none;
+            background: transparent;
+        }
 
-    .chat-messages {
-      height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 10px;
-      background: #f9f9f9;
-      margin-bottom: 10px;
-      word-wrap: break-word;
-    }
+        .chat-container {
+            width: 100%;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
 
-    .message {
-      margin-bottom: 10px;
-      user-select: none; /* Impede a seleção de texto */
-    }
+        .login-container.active,
+        .loader-container.active,
+        .chat-container.active {
+            display: block;
+            /* Exibe a seção ativa */
+        }
 
-    .message span {
-      font-weight: bold;
-    }
+        .login-section,
+        .chat-section {
+            padding: 20px;
+            display: none;
+        }
 
-    .message .date {
-      color: #888;
-      font-size: 12px;
-      margin-left: 5px;
-    }
+        .login-section {
+            max-width: 600px;
+        }
 
-    /* Button to exit room */
-    .exit-button {
-      background: #dc3545;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-    }
+        .login-section.active,
+        .chat-section.active {
+            display: block;
+        }
 
-    .exit-button:hover {
-      background: #c82333;
-    }
-  </style>
+        h2 {
+            margin-bottom: 20px;
+            color: #444;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #6a11cb;
+            box-shadow: 0 0 4px rgba(106, 17, 203, 0.3);
+        }
+
+        button {
+            background: #6a11cb;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #2575fc;
+        }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 120px;
+            height: 120px;
+            -webkit-animation: spin 2s linear infinite;
+            /* Safari */
+            animation: spin 2s linear infinite;
+        }
+
+        /* Safari */
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            background: #f7f7f7;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-container {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+            font-size: 18px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            user-select: none;
+            /* Impede a seleção de texto */
+        }
+
+        .message span {
+            font-weight: bold;
+        }
+
+        .message .date {
+            color: #888;
+            font-size: 14px;
+            margin-left: 5px;
+        }
+
+        .other-message {
+            background-color: #eef2ff;
+            align-self: flex-start;
+        }
+
+        .my-message {
+            background-color: #d2f8e8;
+            align-self: flex-end;
+        }
+
+        .exit-button {
+            background: #e63946;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .exit-button:hover {
+            background: #d62828;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="chat-container">
-    <!-- Login Section -->
-    <div class="login-section active" id="login-section">
-      <h2>Bem Vindo ao Chat</h2>
-      <form id="login-form">
-        <input type="email" id="email" placeholder="Entre com seu email" required>
-        <input type="text" id="room-ID" placeholder="Entre com o id da sala" required>
-        <button type="submit">Entrar</button>
-      </form>
+    <div class="app-container">
+        <div class="login-container">
+
+            <div class="login-section active" id="login-section">
+                <h2>Bem-vindo ao Chat</h2>
+                <form id="login-form">
+                    <input type="email" id="email" placeholder="Digite seu e-mail" required>
+                    <input type="text" id="room-ID" placeholder="Digite o ID da sala" required>
+                    <button type="submit">Entrar</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="loader-container" id="loader-container">
+            <div class="loader"></div>
+        </div>
+
+        <!-- Chat Section -->
+        <div class="chat-container">
+            <div class="chat-section" id="chat-section">
+                <h2>Chat Room</h2>
+                <div class="chat-messages" id="chat-messages"></div>
+                <form id="message-form">
+                    <input type="text" id="message" placeholder="Escreva sua mensagem..." maxlength="1000" minlength="1"
+                        autocomplete="off" autocorrect="off" required>
+                    <button type="submit">Enviar</button>
+                </form>
+                <button class="exit-button" id="exit-button">Sair</button>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Chat Section -->
-    <div class="chat-section" id="chat-section">
-      <h2>Chat Room</h2>
-      <div class="chat-messages" id="chat-messages"></div>
-      <form id="message-form">
-        <input type="text" id="message" placeholder="Escreva sua mensagem..." maxlength="256" minlength="1" required >
-        <button type="submit">Enviar</button>
-      </form>
-      <button class="exit-button" id="exit-button">Sair da Sala</button>
-    </div>
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
-  <script>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+<script>
     const loginSection = document.getElementById('login-section');
     const chatSection = document.getElementById('chat-section');
+    const loaderSection = document.getElementById('loader-container');
     const loginForm = document.getElementById('login-form');
     const messageForm = document.getElementById('message-form');
     const chatMessages = document.getElementById('chat-messages');
@@ -144,116 +278,107 @@
 
     let socket;
     let userEmail;
-
     let loggedInUserName;
 
+    // Extract user name from email
     function getNameFromEmail(email) {
-      return email.split('@')[0];
+        return email.split('@')[0];
     }
 
-    // Handle login form submission
+    // Handle login
     loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const roomID = document.getElementById('room-ID').value;
 
-      const email = document.getElementById('email').value;
-      const name = getNameFromEmail(email)
-      const roomPassword = document.getElementById('room-ID').value;
+        userEmail = email;
+        loggedInUserName = getNameFromEmail(email);
 
-      userEmail = email;
-
-      loggedInUserName = name; 
-
-      // Connect to WebSocket
-      socket = io('http://localhost:3000');
-
-      // Join the room
-      socket.emit('joinRoom', { email, name, password: roomPassword });
-
-      socket.on('chatHistory', (messages) => {
         loginSection.classList.remove('active');
-        chatSection.classList.add('active');
-        console.log(messages)
-        renderMessages(messages);
-      });
+        loaderSection.classList.add('active');
 
-      if (Notification.permission !== 'granted') {
-        Notification.requestPermission();
-      }
+        socket = io(`https://pablo-3000.code.fslab.dev`);
+        socket.emit('joinRoom', { email, name: loggedInUserName, password: roomID });
 
-      function playNotificationSound() {
-        const audio = new Audio('/pages/audios/notificacao.mp3'); // Substitua pelo caminho do seu arquivo de som
-        audio.play();
-      }
+        socket.on('chatHistory', (messages) => {
+            loaderSection.classList.remove('active');
+            chatSection.classList.add('active');
+            renderMessages(messages);
+        });
 
-      // Função para mostrar a notificação
-      function showNotification(message) {
-        if (Notification.permission === 'granted') {
-          new Notification('Nova mensagem!', {
-            body: message,
-            icon: 'path/to/icon.png'  // Você pode adicionar um ícone, se quiser
-          });
+        if (Notification.permission !== 'granted') {
+            Notification.requestPermission();
         }
-      }
 
-      socket.on('newMessage', (message) => {
-        renderMessage(message);
-        console.log(message.name)
-        console.log(loggedInUserName)
-        if (message.name !== loggedInUserName) {
-          showNotification(`${message.name}: ${message.message}`);
-          playNotificationSound();
+        function playNotificationSound() {
+            const audio = new Audio('https://pablo-3000.code.fslab.dev/audios/notificacao.mp3');
+            audio.play();
         }
-      });
 
-      socket.on('error', (errorMessage) => {
-        alert(errorMessage);
-      });
+        // Função para mostrar a notificação
+        function showNotification(message) {
+            if (Notification.permission === 'granted') {
+                new Notification('Nova mensagem!', {
+                    body: message,
+                    icon: 'path/to/icon.png'  // Você pode adicionar um ícone, se quiser
+                });
+            }
+        }
+
+        socket.on('newMessage', (message) => {
+            renderMessage(message);
+            if (message.name !== loggedInUserName) {
+                showNotification(`${message.name}: ${message.message}`);
+                playNotificationSound();
+            }
+        });
+
+        socket.on('error', (message) => alert(message));
     });
 
-    // Handle message form submission
+    // Send message
     messageForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const message = document.getElementById('message').value;
-
-      socket.emit('sendMessage', { email: userEmail, message });
-      document.getElementById('message').value = '';
+        e.preventDefault();
+        const message = document.getElementById('message').value;
+        socket.emit('sendMessage', { email: userEmail, message });
+        document.getElementById('message').value = '';
     });
 
-    // Handle exiting the room
+    // Exit room
     exitButton.addEventListener('click', () => {
-      socket.emit('leaveRoom', { email: userEmail });
-      loginSection.classList.add('active');
-      chatSection.classList.remove('active');
-      socket.disconnect();
+        socket.emit('leaveRoom', { email: userEmail });
+        loginSection.classList.add('active');
+        chatSection.classList.remove('active');
+        socket.disconnect();
     });
 
-    // Render chat messages
+    // Render messages
     function renderMessages(messages) {
-      chatMessages.innerHTML = '';
-      messages.forEach(renderMessage);
+        chatMessages.innerHTML = '';
+        messages.forEach(renderMessage);
     }
 
-    // Render a single message
     function renderMessage({ name, message, date }) {
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('message');
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add('message-container');
 
-      // Detect and convert URLs into clickable links
-      const messageWithLinks = message.replace(/(https?:\/\/[^\s]+)/g, (url) => {
-        return `<a href="${url}" target="_blank" style="color: #007bff; text-decoration: none;">${url}</a>`;
-      });
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
 
-      messageElement.innerHTML = `<span>${name}:</span> ${messageWithLinks} <span class="date">(${new Date(date).toLocaleString()})</span>`;
-      chatMessages.appendChild(messageElement);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+        if (name === loggedInUserName) messageElement.classList.add('my-message');
+        else messageElement.classList.add('other-message');
+
+        messageElement.innerHTML = `<span>${name}:</span> ${message} <span class="date">(${new Date(date).toLocaleString()})</span>`;
+        messageContainer.appendChild(messageElement);
+        chatMessages.appendChild(messageContainer);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     // Bloquear o clique com o botão direito do mouse
     document.addEventListener('contextmenu', (e) => {
-      e.preventDefault(); // Impede o menu de contexto (botão direito)
+        e.preventDefault(); // Impede o menu de contexto (botão direito)
     });
-  </script>
-</body>
+
+</script>
 
 </html>

@@ -11,11 +11,11 @@ export default (server) => {
   });
 
   io.on('connection', (socket) => {
-    console.log('User connected');
+    console.log('Usuário conectado');
     chatHandlers(io, socket);
 
     socket.on('disconnect', () => {
-      console.log('User disconnected');
+      console.log('Usuário desconectado');
     });
   });
 };

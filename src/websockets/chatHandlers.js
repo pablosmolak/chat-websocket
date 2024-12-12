@@ -6,6 +6,7 @@ const chatHandlers = (io, socket) => {
 
   socket.on('joinRoom', async ({ email, name, password }) => {
     try {
+      console.log(`Usuário ${name} entrou na sala ${password}`)
       const validRoom = await chatService.validateRoom(password);
       if (!validRoom) {
         socket.emit('error', 'Invalid room or password');

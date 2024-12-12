@@ -4,7 +4,7 @@ import cors from 'cors';
 import db from "./config/db_config.js";
 import setupWebSocket from './websockets/websocket.js';
 
-//para teste
+// Para teste
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
@@ -23,21 +23,21 @@ db.once("open", function () {
     console.log("Conectado ao banco de dados.");
 });
 
-// Servir arquivos estáticos (se necessário, como CSS ou imagens no futuro)
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Rota para retornar o front.html
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/pages', express.static(path.join(__dirname, 'src', 'pages')));
-
 // Rota para retornar o front.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages', 'front.html'));
 });
 
+app.get('/audios/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, 'pages', 'audios', filename)
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            res.status(404).send('Arquivo de áudio não encontrado');
+        }
+    });
+});
+
 setupWebSocket(server);
 
-
 export default server;
-
