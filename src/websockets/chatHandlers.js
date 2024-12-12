@@ -18,7 +18,7 @@ const chatHandlers = (io, socket) => {
       }
 
       socket.join(password);
-      
+
       const history = await chatService.getChatHistory(password);
 
       const decryptedHistory = history.map((msg) => ({
@@ -32,7 +32,7 @@ const chatHandlers = (io, socket) => {
 
       socket.on('sendMessage', async ({ message, email }) => {
         let user = await UserService.getUsuarioByEmail(email);
-        
+
         await chatService.saveMessage(password, {
           name: user.name,
           message: encryptMessage(message),

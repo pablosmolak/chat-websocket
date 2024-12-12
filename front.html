@@ -77,6 +77,7 @@
       padding: 10px;
       background: #f9f9f9;
       margin-bottom: 10px;
+      word-wrap: break-word;
     }
 
     .message {
@@ -126,7 +127,7 @@
       <h2>Chat Room</h2>
       <div class="chat-messages" id="chat-messages"></div>
       <form id="message-form">
-        <input type="text" id="message" placeholder="Escreva sua mensagem..." required>
+        <input type="text" id="message" placeholder="Escreva sua mensagem..." maxlength="256" minlength="1" required >
         <button type="submit">Enviar</button>
       </form>
       <button class="exit-button" id="exit-button">Sair da Sala</button>
@@ -163,7 +164,7 @@
       loggedInUserName = name; 
 
       // Connect to WebSocket
-      socket = io('http://10.255.64.149:3000');
+      socket = io('http://10.82.0.211:3000');
 
       // Join the room
       socket.emit('joinRoom', { email, name, password: roomPassword });
@@ -180,7 +181,7 @@
       }
 
       function playNotificationSound() {
-        const audio = new Audio('http://10.255.64.149:5500/ai_voice%20(1).mp3'); // Substitua pelo caminho do seu arquivo de som
+        const audio = new Audio('http://10.82.0.211:5500/ai_voice%20(1).mp3'); // Substitua pelo caminho do seu arquivo de som
         audio.play();
       }
 
