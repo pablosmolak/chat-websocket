@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Application</title>
+    <title>ChatterSocket</title>
     <style>
         /* Global styles */
         * {
@@ -276,7 +276,7 @@
         <div class="login-container">
 
             <div class="login-section active" id="login-section">
-                <h2>Bem-vindo ao Chat</h2>
+                <h2>Bem-vindo ao ChatterSocket</h2>
                 <form id="login-form">
                     <input type="email" id="email" placeholder="Digite seu e-mail" required>
                     <input type="text" id="room-ID" placeholder="Digite o ID da sala" autocomplete="off"
@@ -293,7 +293,7 @@
         <!-- Chat Section -->
         <div class="chat-container">
             <div class="chat-section" id="chat-section">
-                <h2>Chat Room</h2>
+                <h2>Socket & Fala</h2>
                 <div class="chat-messages" id="chat-messages"></div>
                 <form id="message-form">
                     <input type="text" id="message" placeholder="Escreva sua mensagem..." maxlength="1000" minlength="1"
@@ -348,7 +348,7 @@
         loginSection.classList.remove('active');
         loaderSection.classList.add('active');
 
-        socket = io(`https://pablo-3000.code.fslab.dev`);
+        socket = io(`${window.location.origin}`);
         socket.emit('joinRoom', { email, name: loggedInUserName, password: roomID });
 
         socket.on('chatHistory', (messages) => {
@@ -364,7 +364,7 @@
         }
 
         function playNotificationSound() {
-            const audio = new Audio('https://pablo-3000.code.fslab.dev/audios/notificacao.mp3');
+            const audio = new Audio(`${window.location.origin}/audios/notificacao.mp3`);
             audio.play();
         }
 

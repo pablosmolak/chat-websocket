@@ -1,13 +1,16 @@
 import chatService from '../services/chatServices.js';
 import UserService from '../services/userServices.js';
-import { decryptMessage, encryptMessage } from '../utils/encrypt.js';
+import { Decrypt, Encrypt } from '../utils/encrypt.js';
 
 const chatHandlers = (io, socket) => {
 
   socket.on('joinRoom', async ({ email, name, password }) => {
     try {
       console.log(`Usuário ${name} entrou na sala ${password}`)
-      const validRoom = await chatService.validateRoom(password);
+
+      const idSala = Encrypt(password)
+
+      const validRoom = await chatService.validateRoom(idSala);
       if (!validRoom) {
         socket.emit('error', 'Invalid room or password');
         return;
@@ -18,15 +21,15 @@ const chatHandlers = (io, socket) => {
         UserService.createUser(name, email);
       }
 
-      socket.join(password);
+      socket.join(idSala);
 
-      const history = await chatService.getChatHistory(password);
+      const history = await chatService.getChatHistory(idSala);
 
       const decryptedHistory = history.map((msg) => ({
         ...msg,
         date: msg.date,
         name: msg.name,
-        message: decryptMessage(msg.message),
+        message: Decrypt(msg.message),
       }));
 
       socket.emit('chatHistory', decryptedHistory);
@@ -34,13 +37,13 @@ const chatHandlers = (io, socket) => {
       socket.on('sendMessage', async ({ message, email }) => {
         let user = await UserService.getUsuarioByEmail(email);
 
-        await chatService.saveMessage(password, {
+        await chatService.saveMessage(idSala, {
           name: user.name,
-          message: encryptMessage(message),
+          message: Encrypt(message),
           date: new Date(),
         });
 
-        io.to(password).emit('newMessage', {
+        io.to(idSala).emit('newMessage', {
           name: user.name,
           message: message,
           date: new Date(),
