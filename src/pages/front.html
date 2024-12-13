@@ -405,6 +405,15 @@
         socket.disconnect();
     });
 
+    // const MAX_MESSAGES = 10;
+
+    // function renderMessages(messages) {
+    //     chatMessages.innerHTML = '';
+    //     const messagesToRender = messages.slice(-MAX_MESSAGES); // Exibe apenas as últimas 100 mensagens
+    //     messagesToRender.forEach(renderMessage);
+    // }
+
+
     // Render messages
     function renderMessages(messages) {
         chatMessages.innerHTML = '';
@@ -450,6 +459,11 @@
                 messageElement.innerHTML = `<span>${name}:</span> Link do youtube inválido. <span class="date">(${new Date(date).toLocaleString()})</span>`;
             }
         }
+        // Verifica se é o comando /audio
+        else if (message.startsWith('/audio ')) {
+            const audioUrl = message.slice(7).trim(); // Extrai a URL após "/audio "
+            messageElement.innerHTML = `<span>${name}:</span> <br> <audio controls style="max-width: 60%;"><source src="${audioUrl}" type="audio/mpeg">Seu navegador não suporta o elemento de áudio.</audio> <span class="date">(${new Date(date).toLocaleString()})</span>`;
+        }
         else {
             messageElement.innerHTML = `<span>${name}:</span> ${messageWithMentions} <span class="date">(${new Date(date).toLocaleString()})</span>`;
         }
@@ -460,6 +474,7 @@
 
         addUserToMentionedList(name);
     }
+
 
 
 
@@ -477,7 +492,8 @@
     // Lista de comandos disponíveis
     const commands = [
         '/imagem',
-        '/youtube'
+        '/youtube',
+        '/audio'
     ];
 
     // Exibir as sugestões conforme o usuário digita
