@@ -227,6 +227,47 @@
         .exit-button:hover {
             background: #d62828;
         }
+
+        .suggestions-list {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 200px;
+            max-height: 150px;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            margin-top: 2px;
+            /* Ajusta para ficar mais perto do input */
+            padding: 5px 0;
+        }
+
+        .suggestions-list div {
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            /* Deixa o texto em negrito */
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 5px;
+        }
+
+        .suggestions-list div:hover {
+            background-color: #f0f0f0;
+            color: #0066cc;
+        }
+
+        .suggestions-list div:active {
+            background-color: #e0e0e0;
+        }
+
+        .suggestions-list div.selected {
+            background-color: #e6f7ff;
+            color: #0066cc;
+        }
     </style>
 </head>
 
@@ -238,7 +279,8 @@
                 <h2>Bem-vindo ao Chat</h2>
                 <form id="login-form">
                     <input type="email" id="email" placeholder="Digite seu e-mail" required>
-                    <input type="text" id="room-ID" placeholder="Digite o ID da sala" required>
+                    <input type="text" id="room-ID" placeholder="Digite o ID da sala" autocomplete="off"
+                        autocorrect="off" required>
                     <button type="submit">Entrar</button>
                 </form>
             </div>
@@ -256,6 +298,8 @@
                 <form id="message-form">
                     <input type="text" id="message" placeholder="Escreva sua mensagem..." maxlength="1000" minlength="1"
                         autocomplete="off" autocorrect="off" required>
+                    <div id="commands-suggestions" class="suggestions-list"></div>
+
                     <button type="submit">Enviar</button>
                 </form>
                 <button class="exit-button" id="exit-button">Sair</button>
@@ -279,10 +323,17 @@
     let socket;
     let userEmail;
     let loggedInUserName;
+    let mentionedUsers = [];
 
     // Extract user name from email
     function getNameFromEmail(email) {
         return email.split('@')[0];
+    }
+
+    function addUserToMentionedList(username) {
+        if (!mentionedUsers.includes(username)) {
+            mentionedUsers.push(username);
+        }
     }
 
     // Handle login
@@ -303,6 +354,8 @@
         socket.on('chatHistory', (messages) => {
             loaderSection.classList.remove('active');
             chatSection.classList.add('active');
+
+            mentionedUsers = [];
             renderMessages(messages);
         });
 
@@ -358,6 +411,7 @@
         messages.forEach(renderMessage);
     }
 
+    // Função para renderizar mensagens
     function renderMessage({ name, message, date }) {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('message-container');
@@ -368,16 +422,157 @@
         if (name === loggedInUserName) messageElement.classList.add('my-message');
         else messageElement.classList.add('other-message');
 
-        messageElement.innerHTML = `<span>${name}:</span> ${message} <span class="date">(${new Date(date).toLocaleString()})</span>`;
+        // Detectar e converter URLs em links clicáveis
+        const messageWithLinks = message.replace(/(https?:\/\/[^\s]+)/g, (url) => {
+            return `<a href="${url}" target="_blank" style="color: #007bff; text-decoration: none;">${url}</a>`;
+        });
+
+        // Detectar menções de @nome e aplicar negrito
+        const messageWithMentions = messageWithLinks.replace(/@([A-Za-z0-9._]+)/g, (match, p1) => {
+            return `<strong style="color: #1d5086;">@${p1}</strong>`;
+        });
+
+        // Verifica se é o comando /imagem
+        if (message.startsWith('/imagem ')) {
+            const imageUrl = message.slice(8).trim(); // Extrai a URL após "/imagem "
+            messageElement.innerHTML = `<span>${name}:</span> <br> <img src="${imageUrl}" alt="Link de imagem inválido." style="max-width: 60%; height: auto; border-radius: 15px;"> <span class="date">(${new Date(date).toLocaleString()})</span>`;
+        }
+        // Verifica se é o comando /youtube
+        else if (message.startsWith('/youtube ')) {
+            const youtubeUrl = message.slice(9).trim(); // Extrai a URL após "/youtube "
+            // Extrai o ID do vídeo do YouTube
+            const videoId = youtubeUrl.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&\s]+)/)?.[1] ||
+                youtubeUrl.match(/(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^&\s]+)/)?.[1];
+
+            if (videoId) {
+                messageElement.innerHTML = `<span>${name}:</span> <br> <iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="max-width: 60%; border-radius: 15px;"></iframe> <span class="date">(${new Date(date).toLocaleString()})</span>`;
+            } else {
+                messageElement.innerHTML = `<span>${name}:</span> Link do youtube inválido. <span class="date">(${new Date(date).toLocaleString()})</span>`;
+            }
+        }
+        else {
+            messageElement.innerHTML = `<span>${name}:</span> ${messageWithMentions} <span class="date">(${new Date(date).toLocaleString()})</span>`;
+        }
+
         messageContainer.appendChild(messageElement);
         chatMessages.appendChild(messageContainer);
         chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        addUserToMentionedList(name);
     }
+
+
 
     // Bloquear o clique com o botão direito do mouse
     document.addEventListener('contextmenu', (e) => {
         e.preventDefault(); // Impede o menu de contexto (botão direito)
     });
+
+
+    const messageInput = document.getElementById('message');
+    const suggestionsList = document.getElementById('commands-suggestions');
+
+    suggestionsList.innerHTML = '';
+
+    // Lista de comandos disponíveis
+    const commands = [
+        '/imagem',
+        '/youtube'
+    ];
+
+    // Exibir as sugestões conforme o usuário digita
+    messageInput.addEventListener('input', (e) => {
+        const inputValue = e.target.value.trim();
+
+        // Exibir a lista de comandos apenas se começar com '/'
+        if (inputValue.includes('/')) {
+            const query = inputValue.slice(1).toLowerCase(); // Remove o '/' da string
+            const filteredCommands = commands.filter(command => command.toLowerCase().includes(query));
+
+            // Limpar a lista de sugestões
+            suggestionsList.innerHTML = '';
+
+            // Adicionar os comandos filtrados
+            filteredCommands.forEach(command => {
+                const commandItem = document.createElement('div');
+                commandItem.textContent = command;
+                commandItem.addEventListener('click', () => {
+                    // Inserir o comando no input ao clicar
+                    messageInput.value = command + ' ';
+                    suggestionsList.innerHTML = '';  // Esconder a lista após a seleção
+
+                    messageInput.focus();  // Garantir que o input esteja em foco
+                });
+                suggestionsList.appendChild(commandItem);
+            });
+
+            // Mostrar ou esconder a lista de sugestões
+            if (filteredCommands.length > 0) {
+                suggestionsList.style.display = 'block';
+            } else {
+                suggestionsList.style.display = 'none';
+            }
+        }
+        else if (inputValue.includes('@')) {
+            // Capturar o último "@" iniciado no texto
+            const match = inputValue.match(/@([^ ]*)$/);
+
+            // Inicializar a lista de comandos filtrados
+            let filteredCommands = [];
+
+            // Exibir a lista apenas se o "@" estiver vazio ou com texto incompleto
+            if (match !== null) {
+                const queryText = match[1] || ''; // Captura o texto após o "@" ou vazio se não houver texto
+
+                // Mostrar sugestões apenas se o "@" estiver vazio ou o texto for incompleto
+                if (queryText === '' || !mentionedUsers.some(user => user.toLowerCase() === queryText.toLowerCase())) {
+                    // Filtrar os comandos que correspondem ao texto após o "@"
+                    filteredCommands = mentionedUsers.filter(command =>
+                        command.toLowerCase().includes(queryText.toLowerCase())
+                    );
+                }
+            }
+
+            console.log(filteredCommands);
+
+            // Limpar a lista de sugestões
+            suggestionsList.innerHTML = '';
+
+            // Adicionar os comandos filtrados à lista de sugestões
+            filteredCommands.forEach(command => {
+                const commandItem = document.createElement('div');
+                commandItem.textContent = command;
+                commandItem.addEventListener('click', () => {
+                    console.log(`Selecionado: ${command}`);
+
+                    // Substituir o texto da menção incompleta pela menção completa
+                    const newText = inputValue.replace(/@([^ ]*)$/, `@${command} `);
+
+                    // Atualizar o valor do input
+                    messageInput.value = newText;
+                    suggestionsList.innerHTML = '';  // Esconder a lista de sugestões
+
+                    // Colocar o cursor no final do input
+                    messageInput.focus();
+                });
+                suggestionsList.appendChild(commandItem);
+            });
+
+            // Mostrar ou esconder a lista de sugestões
+            suggestionsList.style.display = filteredCommands.length > 0 ? 'block' : 'none';
+        }
+        else {
+            suggestionsList.style.display = 'none';  // Esconder a lista quando não começar com '/'
+        }
+    });
+
+    // Fechar a lista de sugestões quando o usuário clicar fora
+    document.addEventListener('click', (e) => {
+        if (!suggestionsList.contains(e.target) && e.target !== messageInput) {
+            suggestionsList.style.display = 'none';
+        }
+    });
+
 
 </script>
 
